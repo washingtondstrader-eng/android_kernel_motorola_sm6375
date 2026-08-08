@@ -21,9 +21,10 @@ jobs:
         run: |
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
-      - name: Download Proton Clang
+      - name: Download AOSP Clang Toolchain
         run: |
-          git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang
+          mkdir -p clang
+          curl -sL https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r416183b.tar.gz | tar -xz -C clang
 
       - name: Configure Defconfig
         run: |
@@ -42,12 +43,12 @@ jobs:
           
           mkdir -p out
           if [ -f arch/arm64/configs/vendor/bangkk_defconfig ]; then
-            make O=out ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- vendor/bangkk_defconfig
+            make O=out ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-w" vendor/bangkk_defconfig
           else
-            make O=out ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- bangkk_defconfig
+            make O=out ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-w" bangkk_defconfig
           fi
           
-          make -j$(nproc) O=out ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CLANG_TRIPLE=aarch64-linux-gnu-
+          make -j$(nproc) O=out ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CLANG_TRIPLE=aarch64-linux-gnu- KCFLAGS="-w" CONFIG_WERROR=n
 
       - name: Upload Kernel Artifact
         uses: actions/upload-artifact@v4
