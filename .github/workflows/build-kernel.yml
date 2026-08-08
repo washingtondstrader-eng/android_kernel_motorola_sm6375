@@ -21,9 +21,10 @@ jobs:
         run: |
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
-      - name: Download Toolchain (Clone)
-        run: |
-          git clone --depth=1 https://gitlab.com/panchajanya/tc-build.git -b master clang
+      - name: Setup Clang (AOSP)
+        uses: TelegramBot-Actions/setup-clang@master
+        with:
+          version: 'r450784d'
 
       - name: Configure Defconfig
         run: |
@@ -32,7 +33,6 @@ jobs:
 
       - name: Compile Kernel
         run: |
-          export PATH=$GITHUB_WORKSPACE/clang/bin:$PATH
           export ARCH=arm64
           export SUBARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
