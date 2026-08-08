@@ -1,4 +1,3 @@
-
 name: Build KernelSU for Moto G84 (bangkk)
 
 on:
@@ -16,38 +15,40 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential bc bison flex libssl-dev libelf-dev git ccache zip curl
+          sudo apt-get install -y build-essential bc bison flex libssl-dev libelf-dev git ccache zip curl gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
 
       - name: Integrate KernelSU
         run: |
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
-      - name: Download Toolchain (AOSP Clang)
+      - name: Setup Clang
         run: |
-          mkdir -p toolchain
-          cd toolchain
-          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r488909.tar.gz
-          mkdir clang && tar -zxvf clang-r488909.tar.gz -C clang
-          cd ..
+          mkdir -p clang
+          wget -q https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/clang+llvm-17.0.6-x86_64-linux-gnu-ubuntu-22.04.tar.xz
+          tar -xf clang+llvm-17.0.6-x86_64-linux-gnu-ubuntu-22.04.tar.xz -C clang --strip-components=1
 
-      - name: Configure & Enable KSU Flags
+      - name: Configure Defconfig
         run: |
           echo "CONFIG_KSU=y" >> arch/arm64/configs/vendor/bangkk_defconfig || true
           echo "CONFIG_KSU=y" >> arch/arm64/configs/bangkk_defconfig || true
 
       - name: Compile Kernel
         run: |
-          export PATH=$GITHUB_WORKSPACE/toolchain/clang/bin:$PATH
+          export PATH=$GITHUB_WORKSPACE/clang/bin:$PATH
           export ARCH=arm64
           export SUBARCH=arm64
-          export CROSS_COMPILE=aarch64-linux-android-
+          export CROSS_COMPILE=aarch64-linux-gnu-
           
           mkdir -p out
-          make O=out ARCH=arm64 vendor/bangkk_defconfig || make O=out ARCH=arm64 bangkk_defconfig
+          if [ -f arch/arm64/configs/vendor/bangkk_defconfig ]; then
+            make O=out ARCH=arm64 vendor/bangkk_defconfig
+          else
+            make O=out ARCH=arm64 bangkk_defconfig
+          fi
           make -j$(nproc) O=out ARCH=arm64 CC=clang CLANG_TRIPLE=aarch64-linux-gnu-
 
       - name: Upload Kernel Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Moto-G84-KernelSU-Image
-          path: out/arch/arm64/boot/Image.gz*
+          path: out/arch/arm64/boot/Image*
