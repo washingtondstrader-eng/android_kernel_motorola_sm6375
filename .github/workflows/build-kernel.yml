@@ -15,7 +15,7 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential bc bison flex libssl-dev libelf-dev git ccache zip curl gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi lib32z1
+          sudo apt-get install -y build-essential bc bison flex libssl-dev libelf-dev git ccache zip curl gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
 
       - name: Integrate KernelSU
         run: |
