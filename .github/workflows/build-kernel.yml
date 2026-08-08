@@ -29,6 +29,8 @@ jobs:
         run: |
           echo "CONFIG_KSU=y" >> arch/arm64/configs/vendor/bangkk_defconfig || true
           echo "CONFIG_KSU=y" >> arch/arm64/configs/bangkk_defconfig || true
+          echo "CONFIG_WERROR=n" >> arch/arm64/configs/vendor/bangkk_defconfig || true
+          echo "CONFIG_WERROR=n" >> arch/arm64/configs/bangkk_defconfig || true
 
       - name: Compile Kernel
         run: |
