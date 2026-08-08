@@ -21,10 +21,9 @@ jobs:
         run: |
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
-      - name: Download Clang Toolchain
+      - name: Download Toolchain (Clone)
         run: |
-          mkdir -p clang
-          curl -sL https://github.com/ZyCroning/ZyC_Clang/releases/download/18.0.0-20231015/ZyC-Clang-18.0.0.tar.gz | tar -xz -C clang
+          git clone --depth=1 https://gitlab.com/panchajanya/tc-build.git -b master clang
 
       - name: Configure Defconfig
         run: |
