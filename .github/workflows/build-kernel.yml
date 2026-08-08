@@ -21,11 +21,10 @@ jobs:
         run: |
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
-      - name: Download AOSP Clang
+      - name: Download Clang Toolchain
         run: |
           mkdir -p clang
-          wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r450784d.tar.gz
-          tar -xf clang-r450784d.tar.gz -C clang
+          curl -sL https://github.com/ZyCroning/ZyC_Clang/releases/download/18.0.0-20231015/ZyC-Clang-18.0.0.tar.gz | tar -xz -C clang
 
       - name: Configure Defconfig
         run: |
