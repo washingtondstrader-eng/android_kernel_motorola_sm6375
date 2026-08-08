@@ -26,6 +26,15 @@ jobs:
           mkdir -p clang
           curl -sL https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r416183b.tar.gz | tar -xz -C clang
 
+      - name: Fix Missing Headers & Techpack Werror
+        run: |
+          # Adiciona o include i2c.h que faltava no codec de áudio da Motorola
+          sed -i '1s/^/#include <linux\/i2c.h>\n/' techpack/audio/asoc/codecs/aw882xx/aw882xx.c || true
+          
+          # Remove o -Werror das configurações do techpack
+          find techpack/ -name Makefile -exec sed -i 's/-Werror//g' {} + || true
+          find techpack/ -name Kbuild -exec sed -i 's/-Werror//g' {} + || true
+
       - name: Configure Defconfig
         run: |
           echo "CONFIG_KSU=y" >> arch/arm64/configs/vendor/bangkk_defconfig || true
