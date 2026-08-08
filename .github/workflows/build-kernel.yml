@@ -21,17 +21,16 @@ jobs:
         run: |
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
-      - name: Download AOSP Clang Toolchain
+      - name: Download Proton Clang
         run: |
-          mkdir -p clang
-          curl -sL https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r416183b.tar.gz | tar -xz -C clang
+          git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang
 
       - name: Fix Missing Headers & Techpack Werror
         run: |
-          # Adiciona o include i2c.h que faltava no codec de áudio da Motorola
+          # Injeta o cabeçalho i2c.h que faltava no driver de áudio aw882xx
           sed -i '1s/^/#include <linux\/i2c.h>\n/' techpack/audio/asoc/codecs/aw882xx/aw882xx.c || true
           
-          # Remove o -Werror das configurações do techpack
+          # Remove restrições de -Werror dos arquivos Makefile/Kbuild do techpack
           find techpack/ -name Makefile -exec sed -i 's/-Werror//g' {} + || true
           find techpack/ -name Kbuild -exec sed -i 's/-Werror//g' {} + || true
 
